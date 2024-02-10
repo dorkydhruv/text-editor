@@ -1,7 +1,16 @@
-use std::io::{self,Read};
+#[allow(clippy::all, clippy::pedantic)]
+mod editor;
+mod terminal;
+pub use terminal::Terminal;
+use editor::Editor;
+pub use editor::Position;
+//Manual way to get control byte
+// fn to_control_byte(c:char)->u8{
+//     let byte = c as u8;
+//     print!("{:?}",byte & 0b0001_1111);
+//     byte & 0b0001_1111
+// }
+
 fn main() {
-    for b in io::stdin().bytes(){
-        let c = b.unwrap() as char;
-        println!("{}",c);
-    }
+    Editor::default().run();
 }
