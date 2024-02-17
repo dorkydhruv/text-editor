@@ -1,4 +1,4 @@
-use crate::document;
+
 use crate::Row;
 use crate::Document;
 use crate::terminal::Terminal;
