@@ -1,5 +1,5 @@
 use crate::Position;
-use std::{fmt::Error, fs, io::Write};
+use std::{fs, io::Write};
 use crate::Row;
 
 #[derive(Default)]
@@ -50,13 +50,14 @@ impl Document {
             row.insert(at.x,c);
         }
     }
+    #[allow(clippy::integer_arithmetic)]
     pub fn delete(&mut self,at:&Position){
         let len = self.len();
         if at.y>=len{
             return;
         }
         self.dirty=true;
-        if at.x==self.rows.get_mut(at.y).unwrap().len() && at.y<len-1{
+        if at.x==self.rows.get_mut(at.y).unwrap().len() && at.y+1<len{
             let next_row =self.rows.remove(at.y+1);
             let row=self.rows.get_mut(at.y).unwrap();
             row.append(&next_row);
@@ -66,12 +67,15 @@ impl Document {
         }
     }
     fn insert_newline(&mut self,at:&Position){
-        
+        if at.y>self.len(){
+            return;
+        }
         if at.y==self.len(){
             self.rows.push(Row::default());
             return;
         }
         let new_row = self.rows.get_mut(at.y).unwrap().split(at.x);
+        #[allow(clippy::integer_arithmetic)]
         self.rows.insert(at.y+1, new_row);
 
     }
