@@ -4,7 +4,6 @@ use crate::terminal::Terminal;
 use termion::color;
 use termion::event::Key;
 use std::env;
-use std::fmt::format;
 use std::time::Duration;
 use std::time::Instant;
 const STATUS_FG_COLOR: color::Rgb = color::Rgb(63,63,63);
@@ -165,6 +164,17 @@ impl Editor{
         let pressed_key = Terminal::read_key()?;
         match pressed_key{
             Key::Ctrl('q')=> self.should_quit=true,
+            Key::Char(c)=>{
+                self.document.insert(&self.position, c);
+                self.move_cursor(Key::Right);
+            },
+            Key::Delete=>self.document.delete(&self.position),
+            Key::Backspace=>{
+                if self.position.x>0 ||self.position.y>0{
+                    self.move_cursor(Key::Left);
+                    self.document.delete(&self.position);
+                }
+            },
             Key::Up | Key::Down | Key::Left | Key::Right | Key::PageDown | Key::PageUp | Key::End | Key::Home => self.move_cursor(pressed_key),
             _ => (),
         }
@@ -185,7 +195,7 @@ impl Editor{
         let Position{x,y} = self.position;
         let width = self.terminal.size().width as usize;
         let height = self.terminal.size().height as usize;
-        let mut offset = &mut self.offset;
+        let  offset = &mut self.offset;
         if y<offset.y{
             offset.y=y;
         }else if y>=offset.y.saturating_add(height){
